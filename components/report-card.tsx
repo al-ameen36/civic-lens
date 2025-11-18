@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Report, ReportCategory } from "@/types/report";
 import { cn } from "@/lib/utils";
 import { useVoting } from "@/hooks/useVoting";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ReportCardProps {
   report: Report;
@@ -46,6 +46,11 @@ const categoryColors: Record<ReportCategory, string> = {
 export function ReportCard({ report, onVoteUpdate }: ReportCardProps) {
   const { vote, removeVote, isVoting } = useVoting();
   const [localReport, setLocalReport] = useState(report);
+
+  // Sync local state with prop changes
+  useEffect(() => {
+    setLocalReport(report);
+  }, [report]);
 
   const handleVote = async (voteType: "up" | "down") => {
     // If user already voted the same way, remove the vote

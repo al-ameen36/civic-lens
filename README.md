@@ -1,221 +1,108 @@
-# 🗺️ Civic Reporter - Community Issue Tracking with Time Travel
+# 🗺️ Civic Reporter - Community Issue Tracking Platform
 
-A modern civic engagement platform that allows citizens to report and track community issues with advanced features like time travel visualization and AI-powered search using Qdrant vector database.
+A modern civic engagement platform that empowers citizens to report, track, and vote on community issues with interactive mapping, smart location selection, and time travel analytics.
 
-## ✨ Features
+## ✨ Key Features
 
-### 🎯 Core Features
-
-- **Interactive Map** - Report and view issues on an interactive dark-themed map
-- **Smart Search** - AI-powered semantic search using Qdrant vector database
-- **Category Filtering** - Filter by Infrastructure, Safety, Aesthetics, Environment
-- **Real-time Updates** - Live issue tracking and community engagement
-
-### 🕰️ Time Travel
-
-- **Historical View** - Travel back in time to see how issues evolved
-- **Playback Controls** - Play/pause timeline with variable speeds (0.5x to 5x)
-- **Timeline Scrubber** - Jump to any point in time instantly
-- **Pattern Recognition** - Identify trends and issue hotspots over time
-
-### 🧠 AI-Powered Insights
-
-- **Vector Search** - Find similar issues using semantic understanding
-- **Issue Clustering** - Automatically group related problems
-- **Predictive Analytics** - Identify potential issue hotspots
-- **Community Sentiment** - Track mood and engagement patterns
+- **🗺️ Interactive Map** - Dark-themed map with real-time issue visualization
+- **📍 Smart Location Picker** - GPS detection, address search, and map-click selection
+- **📱 Rich Media Support** - Upload up to 3 photos (5MB each) + 1 video (50MB)
+- **🗳️ Community Voting** - Upvote/downvote issues with real-time feedback
+- **🔍 Advanced Search** - Filter by 10+ categories with live results
+- **⏰ Time Travel** - Visualize how issues evolved over time
+- **📱 Mobile Responsive** - Touch-optimized interface for all devices
+- **🔔 Smart Notifications** - Toast alerts for location and system feedback
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js 18+
-- Docker (for Qdrant)
+- Docker (for Qdrant database)
 - Mapbox API key
 
-### Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd civic-reporter
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-
-   ```bash
-   cp .env.local.example .env.local
-   # Add your Mapbox API key to .env.local
-   ```
-
-4. **Start the development server**
-
-   ```bash
-   npm run dev
-   ```
-
-5. **Open your browser**
-   Navigate to `http://localhost:3000`
-
-   The app will start with an empty state. To add data, you'll need to enable Qdrant.
-
-## 🗄️ **Enable Qdrant for Data Persistence**
-
-To store and retrieve reports, you need to set up Qdrant:
-
-### **Option A: Docker Compose (Recommended)**
+### Setup
 
 ```bash
+# Clone and install
+git clone <repository-url>
+cd civic-reporter
+npm install
+
+# Configure environment
+cp .env.local.example .env.local
+# Add your Mapbox API key to .env.local
+
+# Start development
+npm run dev
+# Open http://localhost:3000
+```
+
+### Database Setup
+
+```bash
+# Start Qdrant database
 npm run qdrant:compose
-```
 
-### **Option B: Direct Docker**
-
-```bash
-npm run qdrant
-```
-
-### **Option C: Manual Docker**
-
-```bash
-docker run -p 6333:6333 -p 6334:6334 -v $(pwd)/qdrant_storage:/qdrant/storage:z qdrant/qdrant
-```
-
-### **Seed with Data**
-
-```bash
+# Seed with sample data
 npm run seed
-```
 
-### **Stop Qdrant**
-
-```bash
+# Stop database
 npm run qdrant:stop
 ```
 
-## 🏗️ Architecture
+## 🏗️ Tech Stack
 
-### Component Structure
+- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **Database**: Qdrant Vector Database
+- **Maps**: Mapbox GL JS with React Map GL
+- **Icons**: Lucide React
+- **Deployment**: Vercel-ready
+
+## 🎮 How to Use
+
+### Report Issues
+
+1. Click **+** button → Fill form → Select location on interactive map
+2. Upload photos/videos → Choose category → Submit
+
+### Explore Issues
+
+1. **Browse map** - Click markers to view details and vote
+2. **Search & filter** - Find issues by location, category, or keywords
+3. **Time travel** - Watch issues emerge over time with playback controls
+
+### Location Selection
+
+- **Click anywhere** on the map for precise coordinates
+- **Search addresses** with autocomplete
+- **Use GPS location** with smart permission handling
+
+## 📂 Project Structure
 
 ```
-components/
-├── map/
-│   ├── MapContainer.tsx      # Main map component
-│   ├── ReportMarker.tsx      # Individual report markers
-│   └── ReportPopup.tsx       # Report detail popups
-├── time-travel/
-│   └── TimeTravelModal.tsx   # Time travel controls
-└── ui/                       # Reusable UI components
+├── app/                    # Next.js app router
+├── components/
+│   ├── map/               # Map components
+│   ├── timeline/          # Time travel controls
+│   ├── ui/                # Reusable UI components
+│   ├── LocationPicker.tsx # Interactive location selector
+│   └── report-form.tsx    # Issue reporting form
+├── lib/                   # Utilities and configurations
+└── types/                 # TypeScript definitions
 ```
-
-### Data Flow
-
-```
-Frontend (Next.js) → API Routes → Qdrant Vector DB
-                                      ↓
-                              Vector Embeddings
-                              Semantic Search
-                              Geospatial Queries
-```
-
-### Qdrant Integration
-
-- **Collection**: `reports` with 384-dimensional vectors
-- **Embeddings**: Text embeddings for semantic search
-- **Metadata**: Full report data stored as payload
-- **Filters**: Date ranges, categories, geospatial queries
-
-## 🎮 Usage
-
-### Basic Operations
-
-1. **View Reports** - Browse issues on the interactive map
-2. **Search** - Use natural language to find similar issues
-3. **Filter** - Filter by category, date, or location
-4. **Report Issues** - Click the + button to add new reports
-
-### Time Travel Feature
-
-1. **Open Time Travel** - Click the clock icon in bottom right
-2. **Set Date Range** - Choose start and end dates
-3. **Start Journey** - Click "Start Time Travel"
-4. **Navigate** - Use playback controls or scrub the timeline
-5. **Analyze** - Watch issues appear chronologically
-
-### Advanced Search
-
-- **Semantic Search**: "broken streetlights" finds "damaged lighting"
-- **Location Search**: "issues near Central Park"
-- **Category Search**: "safety problems downtown"
-- **Trend Analysis**: "recurring issues this month"
-
-## 🔧 API Endpoints
-
-### Reports
-
-- `GET /api/reports` - Get all reports
-- `POST /api/reports` - Create new report
-- `GET /api/reports/search?q=query` - Semantic search
-
-### Database
-
-- `POST /api/reports/seed` - Seed with sample data
-
-## 🎨 Customization
-
-### Adding New Categories
-
-1. Update `lib/config.ts` with new category
-2. Add corresponding icon from Lucide React
-3. Update TypeScript types in `types/report.ts`
-
-### Extending Search
-
-1. Modify `lib/qdrant.ts` for new search parameters
-2. Add API endpoints in `app/api/`
-3. Update frontend search components
 
 ## 🚀 Deployment
 
-### Qdrant Cloud
+Deploy to Vercel with one click:
 
-1. Sign up for Qdrant Cloud
-2. Update `QDRANT_URL` and `QDRANT_API_KEY` in environment variables
-3. Deploy to Vercel/Netlify
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-repo/civic-reporter)
 
-### Self-Hosted
+**Environment Variables:**
 
-1. Deploy Qdrant using Docker Compose
-2. Configure environment variables
-3. Deploy Next.js app to your preferred platform
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📝 License
-
-MIT License - see LICENSE file for details
-
-## 🙏 Acknowledgments
-
-- **Qdrant** - Vector database for AI-powered search
-- **Mapbox** - Interactive mapping platform
-- **Next.js** - React framework
-- **Tailwind CSS** - Utility-first CSS framework
-- **Lucide React** - Beautiful icon library
+- `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` - Your Mapbox API key
+- `QDRANT_URL` - Qdrant database URL (optional for Qdrant Cloud)
 
 ---
 
-Built with ❤️ for better communities
+**Built with ❤️ for stronger communities**

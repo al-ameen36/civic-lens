@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Map, { Marker } from "react-map-gl";
 import { MapPin, X, Check, Loader2, Search, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,21 +51,27 @@ export function LocationPicker({
   const [isSearching, setIsSearching] = useState(false);
   const [isInitializing, setIsInitializing] = useState(!initialLocation);
   const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
+  const hasInitialized = useRef(false);
 
   const { toasts, removeToast, showError, showSuccess } = useToast();
 
   // Check location permission and get user's current location on component mount
   useEffect(() => {
-    if (!initialLocation) {
+    let isMounted = true;
+
+    if (!initialLocation && !hasInitialized.current) {
+      hasInitialized.current = true;
       const initializeLocation = async () => {
         try {
           // Check if geolocation is supported
           if (!navigator.geolocation) {
-            showError(
-              "Location not supported",
-              "Your browser doesn't support location services"
-            );
-            setIsInitializing(false);
+            if (isMounted) {
+              showError(
+                "Location not supported",
+                "Your browser doesn't support location services"
+              );
+              setIsInitializing(false);
+            }
             return;
           }
 
@@ -73,6 +79,8 @@ export function LocationPicker({
           const permission = await navigator.permissions.query({
             name: "geolocation",
           });
+
+          if (!isMounted) return;
 
           if (permission.state === "denied") {
             showError(
@@ -93,11 +101,15 @@ export function LocationPicker({
           setIsGeocoding(true);
           const location = await getCurrentLocation();
 
-          setViewState({
+          if (!isMounted) return;
+
+          // Update both view state and initialization state together
+          setViewState((prev) => ({
+            ...prev,
             longitude: location.coordinates[0],
             latitude: location.coordinates[1],
             zoom: 15,
-          });
+          }));
 
           showSuccess(
             "Location found",
@@ -105,10 +117,15 @@ export function LocationPicker({
           );
         } catch (error) {
           console.error("Error getting initial location:", error);
-          showError("Location unavailable", "Using default location instead");
+          if (isMounted) {
+            showError("Location unavailable", "Using default location instead");
+          }
         } finally {
-          setIsGeocoding(false);
-          setIsInitializing(false);
+          // Batch state updates to prevent flickering
+          if (isMounted) {
+            setIsGeocoding(false);
+            setIsInitializing(false);
+          }
         }
       };
 
@@ -116,22 +133,33 @@ export function LocationPicker({
     } else {
       setIsInitializing(false);
     }
-  }, [initialLocation, showError, showSuccess]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [initialLocation]); // Removed showError and showSuccess from dependencies
 
   const handleMapClick = useCallback(async (event: any) => {
     const { lng, lat } = event.lngLat;
 
     setIsGeocoding(true);
-    const address = await reverseGeocode(lng, lat);
-    setIsGeocoding(false);
 
-    const location = {
-      coordinates: [lng, lat] as [number, number],
-      address,
-    };
+    try {
+      const address = await reverseGeocode(lng, lat);
 
-    setSelectedLocation(location);
-    setManualAddress(address);
+      const location = {
+        coordinates: [lng, lat] as [number, number],
+        address,
+      };
+
+      // Batch state updates to prevent flickering
+      setSelectedLocation(location);
+      setManualAddress(address);
+    } catch (error) {
+      console.error("Error reverse geocoding:", error);
+    } finally {
+      setIsGeocoding(false);
+    }
   }, []);
 
   const handleConfirm = () => {
