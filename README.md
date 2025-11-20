@@ -1,4 +1,4 @@
-# 🗺️ Civic Reporter - Community Issue Tracking Platform
+# 🗺️ Civic Lens - Community Issue Tracking Platform
 
 A modern civic engagement platform that empowers citizens to report, track, and vote on community issues with interactive mapping, smart location selection, and time travel analytics.
 
@@ -26,7 +26,7 @@ A modern civic engagement platform that empowers citizens to report, track, and 
 ```bash
 # Clone and install
 git clone <repository-url>
-cd civic-reporter
+cd civic-lens
 npm install
 
 # Configure environment
@@ -96,7 +96,7 @@ npm run qdrant:stop
 
 Deploy to Vercel with one click:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-repo/civic-reporter)
+[![Deploy with Vercel](https://vercel.com/button)](https://civic-lens-brown.vercel.app)
 
 **Environment Variables:**
 
